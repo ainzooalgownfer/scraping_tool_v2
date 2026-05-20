@@ -1,0 +1,10 @@
+fastapi==0.115.0
+uvicorn==0.30.6
+celery==5.4.0
+redis==5.0.8
+beautifulsoup4==4.12.3
+requests==2.32.3
+python-dotenv==1.2.2
+alembic
+pydantic-settings
+psycopg2-binary==2.9.9

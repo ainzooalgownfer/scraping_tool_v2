@@ -1,0 +1,47 @@
+@import "tailwindcss";
+
+:root {
+  /* Premium Slate Light Mode Palette */
+  --background: #f8fafc;
+  --foreground: #0f172a;
+  --card-bg: #ffffff;
+  --card-border: #e2e8f0;
+  --text-title: #0f172a;
+  --text-heading: #334155;
+  --text-muted: #64748b;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* Sleek Cyber Dark Mode Palette */
+    --background: #0b0f19;
+    --foreground: #f8fafc;
+    --card-bg: #111827;
+    --card-border: #1f2937;
+    --text-title: #ffffff;
+    --text-heading: #f1f5f9;
+    --text-muted: #94a3b8;
+  }
+}
+
+/* Connects native variables directly to your HTML structure safely */
+body {
+  background-color: var(--background) !important;
+  color: var(--foreground) !important;
+  font-family: Arial, Helvetica, sans-serif;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+/* Contrast Fix: Forces text readability across dark mode themes */
+h1 { color: var(--text-title) !important; }
+h2 { color: var(--text-heading) !important; }
+h3 { color: var(--text-heading) !important; }
+p { color: var(--text-muted) !important; }
+
+/* Dashboard Card Dynamic Theme Adaptations */
+.bg-white {
+  background-color: var(--card-bg) !important;
+}
+.border-gray-100, .border-gray-200, .border-gray-200\/80 {
+  border-color: var(--card-border) !important;
+}

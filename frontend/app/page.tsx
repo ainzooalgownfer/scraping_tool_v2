@@ -27,7 +27,7 @@ interface InferredJob {
 interface DBJob {
   id: number;
   url: string;
-  title: string;
+  name: string; 
 }
 
 export default function Dashboard() {
@@ -52,7 +52,7 @@ export default function Dashboard() {
       // Build a dynamic lookup dictionary using live Postgres rows
       const namesDictionary: Record<number, string> = {};
       activeJobsData.forEach((job) => {
-        namesDictionary[job.id] = job.title;
+        namesDictionary[job.id] = job.name; 
       });
       setJobNamesMap(namesDictionary);
       setResults(telemetryData);
@@ -68,21 +68,26 @@ export default function Dashboard() {
   const processJobsLayout = (dataFeed: Result[], activeJobs: DBJob[], namesLookup: Record<number, string>) => {
     const uniqueJobsMap = new Map<number, InferredJob>();
     
-    // First, populate using empty base models from the true registered jobs query
+    //  Populate using the true names registered in your Postgres database profiles
     activeJobs.forEach((job) => {
+      const cleanTitle = job.name && job.name.trim() !== "" 
+        ? job.name 
+        : `Scraper Profile #${job.id}`;
+
       uniqueJobsMap.set(job.id, {
         id: job.id,
         url: job.url,
-        title: job.title || `Scraper Profile #${job.id}`,
+        title: cleanTitle, 
         lastRun: 'never',
         successCount: 0,
         totalCount: 0,
       });
     });
 
-    // Layer in metric tallies dynamically from execution telemetry records
+    //  Layer in metrics tallies dynamically from execution telemetry records
     dataFeed.forEach((res) => {
       const isSuccess = res.status === 'success' || res.status === 'completed';
+      // Look up the name from the database dictionary first, then fallback to telemetry or node string
       const displayTitle = namesLookup[res.job_id] || res.title || `Scraper Profile #${res.job_id}`;
 
       if (!uniqueJobsMap.has(res.job_id)) {
@@ -99,6 +104,11 @@ export default function Dashboard() {
         current.totalCount += 1;
         if (isSuccess) current.successCount += 1;
         
+        
+        if (namesLookup[res.job_id]) {
+          current.title = namesLookup[res.job_id];
+        }
+
         if (current.lastRun === 'never' || new Date(res.scraped_at) > new Date(current.lastRun)) {
           current.lastRun = res.scraped_at;
         }
@@ -146,7 +156,6 @@ export default function Dashboard() {
     try {
       await deleteJob(jobId);
       setInferredJobs(prev => prev.filter(job => job.id !== jobId));
-      // Clean up telemetry feed to match the sudden backend cascade removal safely
       setResults(prev => prev.filter(res => res.job_id !== jobId));
     } catch (err) {
       console.error(err);

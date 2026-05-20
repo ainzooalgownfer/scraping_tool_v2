@@ -15,6 +15,9 @@ export const deleteJob = (jobId: number) => api.delete(`/jobs/${jobId}`);
 export const getJobs = (limit = 100, offset = 0) => {
   return api.get(`/jobs/?limit=${limit}&offset=${offset}`);
 };
+export const toggleJobActive = (jobId: number, isActive: boolean) => {
+  return api.patch(`/jobs/${jobId}/toggle-active`, { is_active: isActive });
+};
 
 
 // Results

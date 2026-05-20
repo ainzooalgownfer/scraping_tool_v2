@@ -52,7 +52,5 @@ def scrape_quotes_page(url: str = "http://quotes.toscrape.com") -> Dict:
         "links": list(author_links),    
     }
 
-# =====================================================================
-# FIXED NAME ALIAS BRIDGE: Expose scrape_page to satisfy the Celery importer
-# =====================================================================
+
 scrape_page = scrape_quotes_page

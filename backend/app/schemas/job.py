@@ -18,3 +18,6 @@ class JobOut(JobBase):
     updated_at: datetime
 
     model_config = {"from_attributes": True}
+
+class JobToggleActive(BaseModel):
+    is_active: bool

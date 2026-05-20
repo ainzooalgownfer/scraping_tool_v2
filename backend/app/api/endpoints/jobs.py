@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Body
 from sqlalchemy.orm import Session
 from app.schemas import job as job_schemas
 from app.models.job import Job        
@@ -40,6 +40,29 @@ def run_job_now(job_id: int, db: Session = Depends(get_db)):
     return {"task_sent": True, "job_id": job.id}
 
 
+@router.patch("/{job_id}/toggle-active", response_model=job_schemas.JobOut)
+def update_job_activity_status(
+    job_id: int, 
+    is_active: bool = Body(..., embed=True), # Force FastAPI to look inside the JSON body
+    db: Session = Depends(get_db)
+):
+    """
+    Update the active state status flag for a specific scraper target node profile.
+    """
+    # Fetch the target row
+    job = db.query(Job).filter(Job.id == job_id).first()
+    if not job:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, 
+            detail=f"Scraper profile with ID {job_id} not found"
+        )
+    
+    # Mutate the state status flag and commit safely
+    job.is_active = is_active
+    db.commit()
+    db.refresh(job) 
+    
+    return job
 
 @router.delete("/{job_id}", status_code=status.HTTP_200_OK)
 def delete_job(
